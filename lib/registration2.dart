@@ -38,9 +38,9 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
               children: [
                 // SIGN-UP Title
                 Text(
-                  'SIGN-UP',
+                  'Lets get started!',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.openSans(
                     fontSize: 32,
                     // fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -68,7 +68,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       // E-Mail Field
                       Text(
                         'Email',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.openSans(
                           fontSize: 16,
                           color: Colors.grey[700],
                           fontWeight: FontWeight.w500,
@@ -89,14 +89,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                           contentPadding: const EdgeInsets.symmetric(
                               vertical: 16.0, horizontal: 12.0),
                         ),
-                        style: GoogleFonts.inter(),
+                        style: GoogleFonts.openSans(),
                       ),
                       const SizedBox(height: 20),
 
                       // Password Field
                       Text(
                         'Password',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.openSans(
                           fontSize: 16,
                           color: Colors.grey[700],
                           fontWeight: FontWeight.w500,
@@ -148,7 +148,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                                   _agreedToTerms = value!;
                                 });
                               },
-                              activeColor: const Color(0xFF81C2FF),
+                              activeColor: const Color(0xFF000000),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -158,14 +158,14 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                               child: Text.rich(
                                 TextSpan(
                                   text: 'This ensures that you have agreed to ',
-                                  style: GoogleFonts.inter(
+                                  style: GoogleFonts.openSans(
                                     fontSize: 14,
                                     color: Colors.grey[600],
                                   ),
                                   children: [
                                     TextSpan(
                                       text: 'Terms & Policy',
-                                      style: const TextStyle(
+                                      style: GoogleFonts.openSans(
                                         color: Colors.blue,
                                         decoration: TextDecoration.underline,
                                       ),
@@ -225,8 +225,8 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'or',
-                      style: GoogleFonts.inter(
+                      'Account already created?',
+                      style: GoogleFonts.openSans(
                         fontSize: 16,
                         color: Colors.grey[600],
                       ),
@@ -238,7 +238,7 @@ class _RegistrationPage2State extends State<RegistrationPage2> {
                       },
                       child: Text(
                         'Sign-In',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.openSans(
                           fontSize: 16,
                           color: const Color(0xFFFFFFFF),
                           fontWeight: FontWeight.w600,

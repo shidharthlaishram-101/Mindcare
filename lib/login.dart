@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mindcare/registration.dart';
 
 import 'home.dart';
 
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'SIGN-IN',
+                    'Welcome back!',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.openSans(
                       fontSize: 32,
@@ -150,6 +151,33 @@ class _LoginPageState extends State<LoginPage> {
                         )
                       ]
                     ),
+                  ),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'No Account?',
+                        style: GoogleFonts.openSans(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                        ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegistrationPage()));
+                          // Handle sign-in navigation
+                        },
+                        child: Text(
+                          'Sign-Up',
+                          style: GoogleFonts.openSans(
+                            fontSize: 16,
+                            color: const Color(0xFFFFFFFF),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   )
                 ]
             ),

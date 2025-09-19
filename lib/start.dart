@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mindcare/registration.dart';
+import 'package:mindcare/login.dart';
+// import 'package:mindcare/registration.dart';
 // import 'package:mindcare/home.dart';
 
 class StartPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _StartPageState extends State<StartPage> {
     Future.delayed(const Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const RegistrationPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     });
   }
@@ -45,10 +46,7 @@ class _StartPageState extends State<StartPage> {
             Text(
               "your mental health\nassistant",
               textAlign: TextAlign.center,
-              style: GoogleFonts.openSans(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
+              style: GoogleFonts.openSans(fontSize: 14, color: Colors.black54),
             ),
             // GIF instead of static image
             Image.asset(
