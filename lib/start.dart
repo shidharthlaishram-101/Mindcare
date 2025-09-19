@@ -25,7 +25,7 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDEACC), // light beige background
+      backgroundColor: const Color(0xFF81C2FF), // light blue background
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

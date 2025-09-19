@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mindcare/registration2.dart';
 
+import 'login.dart';
+
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -25,7 +27,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDEACC), // light beige background
+      backgroundColor: const Color(0xFF81C2FF), // light beige background
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -54,7 +56,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     borderRadius: BorderRadius.circular(20.0),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -66,7 +68,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       // First Name Field
                       Text(
                         'First Name',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.openSans(
                           fontSize: 16,
                           color: Colors.grey[700],
                           fontWeight: FontWeight.w500,
@@ -137,7 +139,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               borderRadius: BorderRadius.circular(12.0),
                             ),
                             elevation: 5,
-                            shadowColor: Colors.black.withOpacity(0.2),
+                            shadowColor: Colors.black.withValues(alpha: 0.2),
                           ),
                           child: Text(
                             'Next',
@@ -166,13 +168,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     ),
                     TextButton(
                       onPressed: () {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
                         // Handle sign-in navigation
                       },
                       child: Text(
                         'Sign-In',
                         style: GoogleFonts.openSans(
                           fontSize: 16,
-                          color: const Color(0xFF007AFF),
+                          color: const Color(0xFFFFFFFF),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
