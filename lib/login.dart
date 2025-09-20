@@ -194,9 +194,28 @@ class _LoginPageState extends State<LoginPage> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
-          // TODO: Implement sign-in logic
+          // Navigate to the Registration Page
+          Navigator.push
+            (context,
+              PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(1.0, 0.0); // from right to left
+                    const end = Offset.zero;
+                    const curve = Curves.easeInOut;
+
+                    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                    final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: FadeTransition(
+                        opacity: animation.drive(fadeTween),
+                        child: child,
+                      ),
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 800)));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF3C74FF),

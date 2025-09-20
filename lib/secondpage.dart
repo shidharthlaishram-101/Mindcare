@@ -31,18 +31,18 @@ class Secondpage extends StatelessWidget {
               SizedBox(height: screenHeight * 0.1),
 
               // Logo Icon
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF4A90E2), // A nice shade of blue
-                ),
-                child: const Icon(
-                  Icons.location_on,
-                  color: Colors.white,
-                  size: 60,
-                ),
-              ),
+              // Container(
+              //   padding: const EdgeInsets.all(20),
+              //   decoration: const BoxDecoration(
+              //     shape: BoxShape.circle,
+              //     color: Color(0xFF4A90E2), // A nice shade of blue
+              //   ),
+              //   child: const Icon(
+              //     Icons.location_on,
+              //     color: Colors.white,
+              //     size: 60,
+              //   ),
+              // ),
               const SizedBox(height: 20),
 
               // App Name
@@ -67,8 +67,17 @@ class Secondpage extends StatelessWidget {
                 ),
               ),
 
+
+              Image.asset(
+                "assets/video/home_screen.gif",
+                height: 400,
+                fit: BoxFit.contain,
+              ),
+
+
               // Flexible spacer to push buttons to the bottom
               const Spacer(),
+
 
               // Sign Up Button
               SizedBox(
@@ -84,7 +93,27 @@ class Secondpage extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Navigate to the Registration Page
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrationPage()));
+                    Navigator.push
+                      (context,
+                        PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => const RegistrationPage(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1.0, 0.0); // from right to left
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+
+                              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                              final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: FadeTransition(
+                                  opacity: animation.drive(fadeTween),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            transitionDuration: const Duration(milliseconds: 800)));
                   },
                   child: const Text(
                     'Sign Up',
@@ -109,8 +138,28 @@ class Secondpage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Navigate to the Login Page
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                    // Navigate to the Registration Page
+                    Navigator.push
+                      (context,
+                        PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              const begin = Offset(1.0, 0.0); // from right to left
+                              const end = Offset.zero;
+                              const curve = Curves.easeInOut;
+
+                              final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                              final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+
+                              return SlideTransition(
+                                position: animation.drive(tween),
+                                child: FadeTransition(
+                                  opacity: animation.drive(fadeTween),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            transitionDuration: const Duration(milliseconds: 800)));
                   },
                   child: const Text(
                     'Log In',
