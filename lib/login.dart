@@ -1,9 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:mindcare/registration.dart';
+import 'package:mindcare/home.dart';
+import 'package:mindcare/registration.dart'; // Assuming your registration file is named registration.dart
 
-import 'home.dart';
-
+// LoginPage widget builds the main screen UI for signing in.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -12,176 +12,264 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController =  TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isPasswordHidden = true;
-  // bool _isagreedtoTerms = false;
+  // State variable to toggle password visibility
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF81C2FF),
-      body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Welcome back!',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.openSans(
-                      fontSize: 32,
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  Container(
-                    padding: const EdgeInsets.all(24.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ]
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Email',
-                          style: GoogleFonts.openSans(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border:  OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 12.0
-                            ),
-                          ),
-                          style: GoogleFonts.openSans(),
-                        ),
-                        const SizedBox(height: 20),
+      backgroundColor: Colors.white,
+      // Using SingleChildScrollView to prevent overflow on smaller screens
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // "Sign in" Title
+              const Text(
+                'Sign in',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1F1F1F),
+                ),
+              ),
+              const SizedBox(height: 8),
 
-                        //Password Field
-                        Text(
-                          'Password',
-                          style: GoogleFonts.openSans(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _passwordController,
-                          obscureText: _isPasswordHidden,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border:  OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 16.0, horizontal: 12.0
-                            ),
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordHidden = !_isPasswordHidden;
-                                  });
-                                },
-                                icon: Icon(
-                                  _isPasswordHidden
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                  color: Colors.grey[600],
-                                ),
-                            ),
-                          ),
-                          style: GoogleFonts.openSans(),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // SIGN-IN Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF333333),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              elevation: 5,
-                              shadowColor: Colors.black.withValues(alpha: 0.2),
-                          ),
-                            child: Text(
-                              'Sign-In',
-                              style: GoogleFonts.inter(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            ),
-                        )
-                      ]
-                    ),
+              // "Don't have an account?" Text
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    fontFamily: 'Inter',
                   ),
-                  const SizedBox(height: 30),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'No Account?',
-                        style: GoogleFonts.openSans(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                        ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RegistrationPage()));
-                          // Handle sign-in navigation
-                        },
-                        child: Text(
-                          'Sign-Up',
-                          style: GoogleFonts.openSans(
-                            fontSize: 16,
-                            color: const Color(0xFFFFFFFF),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                  children: [
+                    const TextSpan(text: 'Don\'t have an account? '),
+                    TextSpan(
+                      text: 'Sign up',
+                      style: const TextStyle(
+                        color: Color(0xFF3C80FF),
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  )
-                ]
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const RegistrationPage()),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Email Input Field
+              _buildTextField(label: 'Email', hint: 'Enter your email'),
+              const SizedBox(height: 20),
+
+              // Password Input Field
+              _buildPasswordField(),
+              const SizedBox(height: 40),
+
+              // "Sign in" Button
+              _buildSignInButton(),
+              const SizedBox(height: 30),
+
+              // "or" Divider
+              _buildDivider(),
+              const SizedBox(height: 30),
+
+              // Social Sign-in Button
+              _buildSocialButton(
+                icon: 'assets/images/google.png', // Placeholder
+                label: 'Sign in with Google',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper widget to build standard text input fields
+  Widget _buildTextField({required String label, required String hint}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: Colors.black38),
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-          )
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: const BorderSide(color: Color(0xFF3C74FF)),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper widget to build the password field with a visibility toggle
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Password',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          obscureText: !_isPasswordVisible,
+          decoration: InputDecoration(
+            hintText: 'Enter your password',
+            hintStyle: const TextStyle(color: Colors.black38),
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: const BorderSide(color: Color(0xFF3C74FF)),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey,
+              ),
+              onPressed: () {
+                // Toggles the password visibility
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper widget for the main action button
+  Widget _buildSignInButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+          // TODO: Implement sign-in logic
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF3C74FF),
+          padding: const EdgeInsets.symmetric(vertical: 18.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        child: const Text(
+          'Sign in',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper widget for the "or" divider
+  Widget _buildDivider() {
+    return const Row(
+      children: [
+        Expanded(child: Divider(color: Colors.black26)),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'or',
+            style: TextStyle(
+              color: Colors.black45,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: Colors.black26)),
+      ],
+    );
+  }
+
+  // Helper widget for social media sign-in buttons
+  Widget _buildSocialButton({
+    required String icon,
+    required String label,
+    Widget? iconWidget,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          // TODO: Implement social sign-in logic
+        },
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          side: BorderSide(color: Colors.grey.shade300),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          backgroundColor: Colors.white,
+        ),
+        icon: iconWidget ??
+            Image.asset(
+              icon,
+              height: 24.0,
+              width: 24.0,
+            ),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
         ),
       ),
     );

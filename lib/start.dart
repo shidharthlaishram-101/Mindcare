@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mindcare/login.dart';
+// import 'package:mindcare/login.dart';
+import 'package:mindcare/secondpage.dart';
 // import 'package:mindcare/registration.dart';
 // import 'package:mindcare/home.dart';
 
@@ -17,8 +18,9 @@ class _StartPageState extends State<StartPage> {
     super.initState();
     Future.delayed(const Duration(seconds: 5), () {
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => const Secondpage()),
       );
     });
   }

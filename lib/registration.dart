@@ -1,9 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:mindcare/registration2.dart';
+import 'package:mindcare/home.dart';
 
 import 'login.dart';
-
+// RegistrationPage widget builds the main screen UI.
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -12,197 +12,361 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  // Controllers to manage the text in the input fields
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-
-  @override
-  void dispose() {
-    // Clean up the controllers when the widget is disposed
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    super.dispose();
-  }
+  // State variable to toggle password visibility
+  bool _isPasswordVisible = false;
+  bool _agreeToTerms = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          stops: [0.1, 0.5],
-          colors: [
-            const Color(0xFFFAE8C7),
-            const Color(0xFFC7F1FA),
-            // const Color(0xFFE9C7FA),
-            // const Color(0xFF81C2FF),
-          ],
-        )
-      ),
-      child: Scaffold(
-        // backgroundColor: Colors.transparent,
-        backgroundColor: const Color(0xFF81C2FF), // light beige background
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // SIGN-UP Title
-                  Text(
-                    'Lets get started!',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.openSans(
-                      fontSize: 32,
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // White registration form card
-                  Container(
-                    padding: const EdgeInsets.all(24.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // First Name Field
-                        Text(
-                          'First Name',
-                          style: GoogleFonts.openSans(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _firstNameController,
-                          decoration: InputDecoration(
-                            // hintText: 'Value',
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 12.0),
-                          ),
-                          style: GoogleFonts.openSans(),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Last Name Field
-                        Text(
-                          'Last Name',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: _lastNameController,
-                          decoration: InputDecoration(
-                            // hintText: 'Value',
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 12.0),
-                          ),
-                          style: GoogleFonts.openSans(),
-                        ),
-                        const SizedBox(height: 30),
-
-                        // Next Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const RegistrationPage2()));
-                              // final firstName = _firstNameController.text;
-                              // final lastName = _lastNameController.text;
-                              // print('First Name: $firstName, Last Name: $lastName');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF333333),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              elevation: 5,
-                              shadowColor: Colors.black.withValues(alpha: 0.2),
-                            ),
-                            child: Text(
-                              'Next',
-                              style: GoogleFonts.inter(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // "or Sign-In" Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Account already created?',
-                        style: GoogleFonts.openSans(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-                          // Handle sign-in navigation
-                        },
-                        child: Text(
-                          'Sign-In',
-                          style: GoogleFonts.openSans(
-                            fontSize: 16,
-                            color: const Color(0xFFFFFFFF),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      // Using SingleChildScrollView to prevent overflow on smaller screens
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // "Sign up" Title
+              const Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1F1F1F),
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+
+              // "Already have an account?" Text
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    fontFamily: 'Inter',
+                  ),
+                  children: [
+                    const TextSpan(text: 'Already have an account? '),
+                    TextSpan(
+                      text: 'Sign in',
+                      style: const TextStyle(
+                        color: Color(0xFF3C80FF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginPage()),
+                            );
+                          },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Name Input Field
+              _buildTextField(label: 'Name', hint: 'Enter your name'),
+              const SizedBox(height: 20),
+
+              // Email Input Field
+              _buildTextField(label: 'Email', hint: 'Enter your email'),
+              const SizedBox(height: 20),
+
+              // Password Input Field
+              _buildPasswordField(),
+              const SizedBox(height: 20),
+
+              // Checkbox widget
+              _buildTermsAndPolicyCheckbox(),
+              const SizedBox(height: 20),
+
+              // "Create Account" Button
+              _buildCreateAccountButton(),
+              const SizedBox(height: 30),
+
+              // "or" Divider
+              _buildDivider(),
+              const SizedBox(height: 30),
+
+              // Social Sign-up Buttons
+              _buildSocialButton(
+                icon: 'assets/images/google.png', // Placeholder, replace with actual asset
+                label: 'Sign up with Google',
+                // iconWidget: _buildGoogleIcon(),
+              ),
+              // const SizedBox(height: 16),
+              // _buildSocialButton(
+              //   icon: 'assets/apple.png', // Placeholder, replace with actual asset
+              //   label: 'Sign up with Apple',
+              //   iconWidget: const Icon(Icons.apple, color: Colors.black),
+              // ),
+              // const SizedBox(height: 16),
+              // _buildSocialButton(
+              //   icon: 'assets/facebook.png', // Placeholder, replace with actual asset
+              //   label: 'Sign up with Facebook',
+              //   iconWidget: const Icon(Icons.facebook, color: Color(0xFF1877F2)),
+              // ),
+            ],
           ),
         ),
       ),
     );
   }
+
+  // Helper widget to build standard text input fields
+  Widget _buildTextField({required String label, required String hint}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: Colors.black38),
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: const BorderSide(color: Color(0xFF3C74FF)),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper widget to build the password field with a visibility toggle
+  Widget _buildPasswordField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Password',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          obscureText: !_isPasswordVisible,
+          decoration: InputDecoration(
+            hintText: '8 - 12 characters',
+            hintStyle: const TextStyle(color: Colors.black38),
+            contentPadding:
+            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: const BorderSide(color: Color(0xFF3C74FF)),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey,
+              ),
+              onPressed: () {
+                // Toggles the password visibility
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper widget for the main action button
+  // Helper widget for the main action button
+  Widget _buildCreateAccountButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        // Use the _agreeToTerms variable to control the button's state
+        onPressed: _agreeToTerms
+            ? () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+          // TODO: Implement account creation logic
+        }
+            : null, // Button is disabled if terms are not agreed to
+        style: ElevatedButton.styleFrom(
+          // Change background color based on whether terms are agreed to
+          backgroundColor:
+          _agreeToTerms ? const Color(0xFF3C74FF) : Colors.grey.shade300,
+          padding: const EdgeInsets.symmetric(vertical: 18.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        child: Text(
+          'Create Account',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            // Change text color for better contrast
+            color: _agreeToTerms ? Colors.white : Colors.black54,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Helper widget for the "or" divider
+  Widget _buildDivider() {
+    return const Row(
+      children: [
+        Expanded(child: Divider(color: Colors.black26)),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            'or',
+            style: TextStyle(
+              color: Colors.black45,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: Colors.black26)),
+      ],
+    );
+  }
+
+  // Helper widget for social media sign-up buttons
+  Widget _buildSocialButton({
+    required String icon,
+    required String label,
+    Widget? iconWidget,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          // TODO: Implement social sign-up logic
+        },
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          side: BorderSide(color: Colors.grey.shade300),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          backgroundColor: Colors.white,
+        ),
+        icon: iconWidget ??
+            Image.asset(
+              icon,
+              height: 24.0,
+              width: 24.0,
+            ),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Add this new helper method anywhere inside your _RegistrationPageState class
+
+  // Helper widget for the Terms & Policy checkbox
+  Widget _buildTermsAndPolicyCheckbox() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _agreeToTerms,
+          onChanged: (bool? value) {
+            setState(() {
+              _agreeToTerms = value ?? false;
+            });
+          },
+          activeColor: const Color(0xFF3C74FF),
+        ),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+                fontFamily: 'Inter',
+              ),
+              children: [
+                const TextSpan(text: 'I agree with the '),
+                TextSpan(
+                  text: 'Terms',
+                  style: const TextStyle(
+                    color: Color(0xFF3C80FF),
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  // recognizer: TapGestureRecognizer()..onTap = () {
+                  //   // TODO: Navigate to Terms page
+                  //   print('Terms tapped!');
+                  // },
+                ),
+                const TextSpan(text: ' & '),
+                TextSpan(
+                  text: 'Policy',
+                  style: const TextStyle(
+                    color: Color(0xFF3C80FF),
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
+                  // recognizer: TapGestureRecognizer()..onTap = () {
+                  //   // TODO: Navigate to Policy page
+                  //   print('Policy tapped!');
+                  // },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  // A custom widget for the Google icon to match the design
+//   Widget _buildGoogleIcon() {
+//     return Image.network(
+//       'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
+//       height: 22,
+//       width: 22,
+//     );
+//   }
 }
