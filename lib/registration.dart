@@ -46,11 +46,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   // Function to handle email & password registration
   Future<void> _createAccountWithEmailAndPassword() async {
+    // Validate Terms Agreement
     if (!_agreeToTerms) {
       _showErrorSnackBar("Please agree to the Terms & Policy to continue.");
       return;
     }
-    // Set loading state to true to show progress indicator
+
+    // Input Validation (Pre-checks)
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty) {
+      _showErrorSnackBar("Please enter your name.");
+      return;
+    }
+    if (email.isEmpty || !email.contains('@')) {
+      _showErrorSnackBar("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      _showErrorSnackBar("Password must be at least 6 characters long.");
+      return;
+    }
+
+    // Set loading state to true
     setState(() {
       _isLoading = true;
     });
@@ -58,38 +78,45 @@ class _RegistrationPageState extends State<RegistrationPage> {
     try {
       // Create user with Firebase Auth
       final UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-          );
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      // If user is created successfully, update their profile with the name
-      if (userCredential.user != null) {
-        await userCredential.user!.updateDisplayName(
-          _nameController.text.trim(),
-        );
-        // Reload user to get the updated info
-        await userCredential.user!.reload();
+      final user = userCredential.user;
 
-        // Navigate to HomePage on successful registration
+      if (user != null) {
+        // Update display name
+        await user.updateDisplayName(name);
+        await user.reload();
+
+        // Save user info in Firestore
+        await _firestore.collection("Users").doc(user.uid).set({
+          "uid": user.uid,
+          "name": name,
+          "email": user.email,
+          "createdAt": FieldValue.serverTimestamp(),
+          "signInMethod": "email_password",
+        });
+
+        // Navigate to HomePage
         _navigateToHome();
       }
     } on FirebaseAuthException catch (e) {
-      // Handle specific Firebase errors
+      // Firebase-specific error handling
       String message;
       if (e.code == 'weak-password') {
         message = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
         message = 'An account already exists for that email.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is invalid.';
       } else {
         message = 'An error occurred. Please try again.';
       }
       _showErrorSnackBar(message);
     } catch (e) {
-      // Handle other potential errors
+      // General error handling
       _showErrorSnackBar('An unexpected error occurred.');
     } finally {
-      // Set loading state to false after operation is complete
+      // Reset loading state
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -147,6 +174,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
         // New user → save info in Firestore
         await userDoc.set({
+          "uid": userCredential.user!.uid,
           "email": userCredential.user!.email,
           "createdAt": FieldValue.serverTimestamp(),
           "signInMethod": "google",
