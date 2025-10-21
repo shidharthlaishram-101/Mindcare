@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // Google Sign-In package is needed for Google authentication
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:mindcare/home.dart';
+// import 'package:mindcare/home.dart';
 import 'package:mindcare/login.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
