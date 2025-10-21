@@ -10,6 +10,7 @@ import 'package:mindcare/home.dart';
 import 'package:mindcare/login.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mindcare/userinfo.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -20,7 +21,7 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   // Controllers to manage user input for text fields
-  final TextEditingController _nameController = TextEditingController();
+  // final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -36,7 +37,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   void dispose() {
     // Dispose controllers to free up resources
-    _nameController.dispose();
+    // _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -53,14 +54,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
 
     // Input Validation (Pre-checks)
-    final name = _nameController.text.trim();
+    // final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (name.isEmpty) {
-      _showErrorSnackBar("Please enter your name.");
-      return;
-    }
+    // if (name.isEmpty) {
+    //   _showErrorSnackBar("Please enter your name.");
+    //   return;
+    // }
     if (email.isEmpty || !email.contains('@')) {
       _showErrorSnackBar("Please enter a valid email address.");
       return;
@@ -84,13 +85,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       if (user != null) {
         // Update display name
-        await user.updateDisplayName(name);
+        // await user.updateDisplayName(name);
         await user.reload();
 
         // Save user info in Firestore
         await _firestore.collection("Users").doc(user.uid).set({
           "uid": user.uid,
-          "name": name,
+          // "name": name,
           "email": user.email,
           "createdAt": FieldValue.serverTimestamp(),
           "signInMethod": "email_password",
@@ -194,7 +195,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (!mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
+      MaterialPageRoute(builder: (context) => const UserInfoPage()),
     );
   }
 
@@ -254,12 +255,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
               const SizedBox(height: 40),
-              _buildTextField(
-                label: 'Name',
-                hint: 'Enter your name',
-                controller: _nameController,
-              ),
-              const SizedBox(height: 20),
+              // _buildTextField(
+              //   label: 'Name',
+              //   hint: 'Enter your name',
+              //   controller: _nameController,
+              // ),
+              // const SizedBox(height: 20),
               _buildTextField(
                 label: 'Email',
                 hint: 'Enter your email',
