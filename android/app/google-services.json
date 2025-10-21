@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "196820978897",
+    "firebase_url": "https://mindcare-97d3b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mindcare-97d3b",
+    "storage_bucket": "mindcare-97d3b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196820978897:android:4e75a06cc37b4f515c49f0",
+        "android_client_info": {
+          "package_name": "com.major.mindcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.major.mindcare",
+            "certificate_hash": "5a66f0fe99d7c1b7194a1c638ea96acdbe586578"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmuh4oMggojCnmjRoJ2f5xo4hnWvO-d1M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

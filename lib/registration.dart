@@ -1,9 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+// Firebase Core and Auth are required for Firebase services
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+// Google Sign-In package is needed for Google authentication
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mindcare/home.dart';
+import 'package:mindcare/login.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'login.dart';
-// RegistrationPage widget builds the main screen UI.
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
 
@@ -12,22 +19,174 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  // State variable to toggle password visibility
+  // Controllers to manage user input for text fields
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // State variables for UI logic
   bool _isPasswordVisible = false;
   bool _agreeToTerms = false;
+  bool _isLoading =
+      false; // To show a loading indicator during async operations
+
+  @override
+  void dispose() {
+    // Dispose controllers to free up resources
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // --- FIREBASE AUTHENTICATION LOGIC ---
+
+  // Function to handle email & password registration
+  Future<void> _createAccountWithEmailAndPassword() async {
+    if (!_agreeToTerms) {
+      _showErrorSnackBar("Please agree to the Terms & Policy to continue.");
+      return;
+    }
+    // Set loading state to true to show progress indicator
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Create user with Firebase Auth
+      final UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      // If user is created successfully, update their profile with the name
+      if (userCredential.user != null) {
+        await userCredential.user!.updateDisplayName(
+          _nameController.text.trim(),
+        );
+        // Reload user to get the updated info
+        await userCredential.user!.reload();
+
+        // Navigate to HomePage on successful registration
+        _navigateToHome();
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle specific Firebase errors
+      String message;
+      if (e.code == 'weak-password') {
+        message = 'The password provided is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'An account already exists for that email.';
+      } else {
+        message = 'An error occurred. Please try again.';
+      }
+      _showErrorSnackBar(message);
+    } catch (e) {
+      // Handle other potential errors
+      _showErrorSnackBar('An unexpected error occurred.');
+    } finally {
+      // Set loading state to false after operation is complete
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Sign up with Google
+  Future<void> signUpWithGoogle() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Initialize the GoogleSignIn instance (v7.2.0)
+      await _googleSignIn.initialize(
+        clientId:
+            '196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com',
+        serverClientId:
+            '196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com',
+      );
+
+      // Trigger Google Sign-In
+      final GoogleSignInAccount? googleUser =
+          await _googleSignIn.authenticate();
+
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return; // User canceled
+      }
+
+      // Get Google authentication tokens
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create Firebase credential with only idToken
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in with Firebase
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        final userDoc = _firestore
+            .collection("Users")
+            .doc(userCredential.user!.uid);
+
+        // Check if the user already exists
+        if ((await userDoc.get()).exists) {
+          _showErrorSnackBar("This account already exists. Please sign in.");
+          await FirebaseAuth.instance.signOut(); // optional: sign them out
+          return;
+        }
+
+        // New user → save info in Firestore
+        await userDoc.set({
+          "email": userCredential.user!.email,
+          "createdAt": FieldValue.serverTimestamp(),
+          "signInMethod": "google",
+        });
+      }
+
+      _navigateToHome();
+    } catch (e) {
+      _showErrorSnackBar("Google Sign-Up failed: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  // --- NAVIGATION AND UI HELPERS ---
+  void _navigateToHome() {
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // Using SingleChildScrollView to prevent overflow on smaller screens
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // "Sign up" Title
               const Text(
                 'Sign up',
                 style: TextStyle(
@@ -37,8 +196,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
               const SizedBox(height: 8),
-
-              // "Already have an account?" Text
               RichText(
                 text: TextSpan(
                   style: const TextStyle(
@@ -54,62 +211,46 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         color: Color(0xFF3C80FF),
                         fontWeight: FontWeight.bold,
                       ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                            );
-                          },
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                              );
+                            },
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Name Input Field
-              _buildTextField(label: 'Name', hint: 'Enter your name'),
+              _buildTextField(
+                label: 'Name',
+                hint: 'Enter your name',
+                controller: _nameController,
+              ),
               const SizedBox(height: 20),
-
-              // Email Input Field
-              _buildTextField(label: 'Email', hint: 'Enter your email'),
+              _buildTextField(
+                label: 'Email',
+                hint: 'Enter your email',
+                controller: _emailController,
+              ),
               const SizedBox(height: 20),
-
-              // Password Input Field
               _buildPasswordField(),
               const SizedBox(height: 20),
-
-              // Checkbox widget
               _buildTermsAndPolicyCheckbox(),
               const SizedBox(height: 20),
-
-              // "Create Account" Button
               _buildCreateAccountButton(),
               const SizedBox(height: 30),
-
-              // "or" Divider
               _buildDivider(),
               const SizedBox(height: 30),
-
-              // Social Sign-up Buttons
               _buildSocialButton(
-                icon: 'assets/images/google.png', // Placeholder, replace with actual asset
+                icon: 'assets/images/google.png',
                 label: 'Sign up with Google',
-                // iconWidget: _buildGoogleIcon(),
+                onPressed: signUpWithGoogle,
               ),
-              // const SizedBox(height: 16),
-              // _buildSocialButton(
-              //   icon: 'assets/apple.png', // Placeholder, replace with actual asset
-              //   label: 'Sign up with Apple',
-              //   iconWidget: const Icon(Icons.apple, color: Colors.black),
-              // ),
-              // const SizedBox(height: 16),
-              // _buildSocialButton(
-              //   icon: 'assets/facebook.png', // Placeholder, replace with actual asset
-              //   label: 'Sign up with Facebook',
-              //   iconWidget: const Icon(Icons.facebook, color: Color(0xFF1877F2)),
-              // ),
             ],
           ),
         ),
@@ -117,8 +258,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // Helper widget to build standard text input fields
-  Widget _buildTextField({required String label, required String hint}) {
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -132,11 +276,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller, // Link the controller to the text field
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.black38),
-            contentPadding:
-            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 16.0,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -157,7 +304,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // Helper widget to build the password field with a visibility toggle
   Widget _buildPasswordField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,12 +318,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller:
+              _passwordController, // Link the controller to the password field
           obscureText: !_isPasswordVisible,
           decoration: InputDecoration(
             hintText: '8 - 12 characters',
             hintStyle: const TextStyle(color: Colors.black38),
-            contentPadding:
-            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 16.0,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -198,7 +348,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 color: Colors.grey,
               ),
               onPressed: () {
-                // Toggles the password visibility
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
@@ -210,62 +359,44 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // Helper widget for the main action button
-  // Helper widget for the main action button
   Widget _buildCreateAccountButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        // Use the _agreeToTerms variable to control the button's state
-        onPressed: _agreeToTerms
-            ? () {
-          Navigator.push
-            (context,
-              PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(1.0, 0.0); // from right to left
-                    const end = Offset.zero;
-                    const curve = Curves.easeInOut;
-
-                    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                    final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
-
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: FadeTransition(
-                        opacity: animation.drive(fadeTween),
-                        child: child,
-                      ),
-                    );
-                  },
-                  transitionDuration: const Duration(milliseconds: 800)));
-          // TODO: Implement account creation logic
-        }
-            : null, // Button is disabled if terms are not agreed to
+        onPressed:
+            (_agreeToTerms && !_isLoading)
+                ? _createAccountWithEmailAndPassword
+                : null,
         style: ElevatedButton.styleFrom(
-          // Change background color based on whether terms are agreed to
           backgroundColor:
-          _agreeToTerms ? const Color(0xFF3C74FF) : Colors.grey.shade300,
+              _agreeToTerms ? const Color(0xFF3C74FF) : Colors.grey.shade300,
           padding: const EdgeInsets.symmetric(vertical: 18.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
         ),
-        child: Text(
-          'Create Account',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            // Change text color for better contrast
-            color: _agreeToTerms ? Colors.white : Colors.black54,
-          ),
-        ),
+        child:
+            _isLoading
+                ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+                : Text(
+                  'Create Account',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: _agreeToTerms ? Colors.white : Colors.black54,
+                  ),
+                ),
       ),
     );
   }
 
-  // Helper widget for the "or" divider
   Widget _buildDivider() {
     return const Row(
       children: [
@@ -274,10 +405,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'or',
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.black45, fontSize: 16),
           ),
         ),
         Expanded(child: Divider(color: Colors.black26)),
@@ -285,47 +413,42 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  // Helper widget for social media sign-up buttons
   Widget _buildSocialButton({
     required String icon,
     required String label,
-    Widget? iconWidget,
+    required VoidCallback onPressed,
   }) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () {
-          // TODO: Implement social sign-up logic
-        },
+        onPressed: (_agreeToTerms && !_isLoading) ? onPressed : null,
+        // _isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           side: BorderSide(color: Colors.grey.shade300),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          backgroundColor: Colors.white,
+          backgroundColor: _agreeToTerms ? Colors.white : Colors.grey.shade300,
         ),
-        icon: iconWidget ??
-            Image.asset(
-              icon,
-              height: 24.0,
-              width: 24.0,
-            ),
+        icon: Image.asset(
+          icon,
+          height: 24.0,
+          width: 24.0,
+          color: _agreeToTerms ? null : Colors.white,
+        ),
         label: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: _agreeToTerms ? Colors.black87 : Colors.black54,
           ),
         ),
       ),
     );
   }
 
-  // Add this new helper method anywhere inside your _RegistrationPageState class
-
-  // Helper widget for the Terms & Policy checkbox
   Widget _buildTermsAndPolicyCheckbox() {
     return Row(
       children: [
@@ -355,10 +478,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
                   ),
-                  // recognizer: TapGestureRecognizer()..onTap = () {
-                  //   // TODO: Navigate to Terms page
-                  //   print('Terms tapped!');
-                  // },
                 ),
                 const TextSpan(text: ' & '),
                 TextSpan(
@@ -368,10 +487,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
                   ),
-                  // recognizer: TapGestureRecognizer()..onTap = () {
-                  //   // TODO: Navigate to Policy page
-                  //   print('Policy tapped!');
-                  // },
                 ),
               ],
             ),
@@ -380,12 +495,4 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ],
     );
   }
-  // A custom widget for the Google icon to match the design
-//   Widget _buildGoogleIcon() {
-//     return Image.network(
-//       'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
-//       height: 22,
-//       width: 22,
-//     );
-//   }
 }

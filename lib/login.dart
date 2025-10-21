@@ -1,7 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mindcare/home.dart';
-import 'package:mindcare/registration.dart'; // Assuming your registration file is named registration.dart
+import 'package:mindcare/registration.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // LoginPage widget builds the main screen UI for signing in.
 class LoginPage extends StatefulWidget {
@@ -12,21 +15,150 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // State variable to toggle password visibility
+  // Controllers for email and password fields
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // State variables for UI logic
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // --- FIREBASE AUTHENTICATION LOGIC ---
+
+  // Function to handle email & password sign-in
+  Future<void> _signInWithEmailAndPassword() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      _navigateToHome();
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      } else {
+        message = 'An error occurred. Please check your credentials.';
+      }
+      _showErrorSnackBar(message);
+    } catch (e) {
+      _showErrorSnackBar('An unexpected error occurred.');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Function to handle Google Sign-In
+  Future<void> signInWithGoogle() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+
+    try {
+      // Initialize the GoogleSignIn instance (v7.2.0)
+      await _googleSignIn.initialize(
+        clientId:
+            '196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com',
+        serverClientId:
+            '196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com',
+      );
+
+      // Trigger Google Sign-In
+      final GoogleSignInAccount? googleUser =
+          await _googleSignIn.authenticate();
+
+      if (googleUser == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return; // User canceled the sign-in
+      }
+
+      // Get Google authentication tokens
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Create Firebase credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
+
+      // --- NEW LOGIC STARTS HERE ---
+      // Check if the user exists in the database
+      if (userCredential.user != null) {
+        final DocumentSnapshot userDoc =
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(userCredential.user!.uid)
+                .get();
+
+        if (userDoc.exists) {
+          // User exists in Firestore, proceed to home page
+          _navigateToHome();
+        } else {
+          // User does not exist in Firestore, sign them out and show an error.
+          // This prevents users who haven't registered from logging in.
+          await _googleSignIn.signOut();
+          await FirebaseAuth.instance.signOut();
+          _showErrorSnackBar("User does not exist. Please sign up first.");
+        }
+      }
+      // --- NEW LOGIC ENDS HERE ---
+    } catch (e) {
+      _showErrorSnackBar("Google Sign-In failed: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  // --- NAVIGATION AND UI HELPERS ---
+
+  void _navigateToHome() {
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // Using SingleChildScrollView to prevent overflow on smaller screens
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // "Sign in" Title
               const Text(
                 'Sign in',
                 style: TextStyle(
@@ -36,8 +168,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 8),
-
-              // "Don't have an account?" Text
               RichText(
                 text: TextSpan(
                   style: const TextStyle(
@@ -53,40 +183,38 @@ class _LoginPageState extends State<LoginPage> {
                         color: Color(0xFF3C80FF),
                         fontWeight: FontWeight.bold,
                       ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const RegistrationPage()),
-                          );
-                        },
+                      recognizer:
+                          TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => const RegistrationPage(),
+                                ),
+                              );
+                            },
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Email Input Field
-              _buildTextField(label: 'Email', hint: 'Enter your email'),
+              _buildTextField(
+                label: 'Email',
+                hint: 'Enter your email',
+                controller: _emailController,
+              ),
               const SizedBox(height: 20),
-
-              // Password Input Field
               _buildPasswordField(),
               const SizedBox(height: 40),
-
-              // "Sign in" Button
               _buildSignInButton(),
               const SizedBox(height: 30),
-
-              // "or" Divider
               _buildDivider(),
               const SizedBox(height: 30),
-
-              // Social Sign-in Button
               _buildSocialButton(
-                icon: 'assets/images/google.png', // Placeholder
+                icon: 'assets/images/google.png',
                 label: 'Sign in with Google',
+                onPressed: signInWithGoogle,
               ),
             ],
           ),
@@ -95,8 +223,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Helper widget to build standard text input fields
-  Widget _buildTextField({required String label, required String hint}) {
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -110,11 +241,14 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: controller,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.black38),
-            contentPadding:
-            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 16.0,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -135,7 +269,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Helper widget to build the password field with a visibility toggle
   Widget _buildPasswordField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,12 +283,15 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 8),
         TextField(
+          controller: _passwordController,
           obscureText: !_isPasswordVisible,
           decoration: InputDecoration(
             hintText: 'Enter your password',
             hintStyle: const TextStyle(color: Colors.black38),
-            contentPadding:
-            const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 16.0,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -176,7 +312,6 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.grey,
               ),
               onPressed: () {
-                // Toggles the password visibility
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
@@ -188,35 +323,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Helper widget for the main action button
   Widget _buildSignInButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          // Navigate to the Registration Page
-          Navigator.push
-            (context,
-              PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) => const HomePage(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    const begin = Offset(1.0, 0.0); // from right to left
-                    const end = Offset.zero;
-                    const curve = Curves.easeInOut;
-
-                    final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                    final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
-
-                    return SlideTransition(
-                      position: animation.drive(tween),
-                      child: FadeTransition(
-                        opacity: animation.drive(fadeTween),
-                        child: child,
-                      ),
-                    );
-                  },
-                  transitionDuration: const Duration(milliseconds: 800)));
-        },
+        onPressed: _isLoading ? null : _signInWithEmailAndPassword,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF3C74FF),
           padding: const EdgeInsets.symmetric(vertical: 18.0),
@@ -224,19 +335,28 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: BorderRadius.circular(12.0),
           ),
         ),
-        child: const Text(
-          'Sign in',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+        child:
+            _isLoading
+                ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+                : const Text(
+                  'Sign in',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
       ),
     );
   }
 
-  // Helper widget for the "or" divider
   Widget _buildDivider() {
     return const Row(
       children: [
@@ -245,10 +365,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
             'or',
-            style: TextStyle(
-              color: Colors.black45,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.black45, fontSize: 16),
           ),
         ),
         Expanded(child: Divider(color: Colors.black26)),
@@ -256,18 +373,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Helper widget for social media sign-in buttons
   Widget _buildSocialButton({
     required String icon,
     required String label,
-    Widget? iconWidget,
+    required VoidCallback onPressed,
   }) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () {
-          // TODO: Implement social sign-in logic
-        },
+        onPressed: _isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           side: BorderSide(color: Colors.grey.shade300),
@@ -276,12 +390,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           backgroundColor: Colors.white,
         ),
-        icon: iconWidget ??
-            Image.asset(
-              icon,
-              height: 24.0,
-              width: 24.0,
-            ),
+        icon: Image.asset(icon, height: 24.0, width: 24.0),
         label: Text(
           label,
           style: const TextStyle(

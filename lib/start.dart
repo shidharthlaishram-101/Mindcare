@@ -31,18 +31,23 @@ class _StartPageState extends State<StartPage>
     );
 
     // Scale animation
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 2.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 2.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     // Opacity animation for image
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     // Opacity animation for text
     _textOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 1.0, curve: Curves.easeIn)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
     );
 
     // Slide animation for text
@@ -50,7 +55,10 @@ class _StartPageState extends State<StartPage>
       begin: const Offset(0, 0.5), // starts slightly below
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.5, 1.0, curve: Curves.easeOut)),
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
+      ),
     );
 
     _controller.forward(); // start animation
@@ -61,15 +69,22 @@ class _StartPageState extends State<StartPage>
         // ignore: use_build_context_synchronously
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const Secondpage(),
+          pageBuilder:
+              (context, animation, secondaryAnimation) => const Secondpage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // Fade + slide transition
             const begin = Offset(1.0, 0.0); // from right to left
             const end = Offset.zero;
             const curve = Curves.easeInOut;
 
-            final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            final fadeTween = Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: curve));
+            final tween = Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve));
+            final fadeTween = Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).chain(CurveTween(curve: curve));
 
             return SlideTransition(
               position: animation.drive(tween),
