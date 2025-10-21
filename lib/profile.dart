@@ -13,6 +13,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  String? _selectedGender;
+  int? _age;
 
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -21,6 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
     String firstName = '';
     String lastName = '';
     String email = user.email ?? '';
+    int? age;
+    String? gender;
 
     try {
       final doc =
@@ -33,6 +38,11 @@ class _ProfilePageState extends State<ProfilePage> {
         final data = doc.data()!;
         firstName = data['firstName'] ?? firstName;
         lastName = data['lastName'] ?? lastName;
+        age =
+            (data['age'] is int)
+                ? data['age']
+                : int.tryParse(data['age']?.toString() ?? '');
+        gender = data['gender'] ?? gender;
       }
     } catch (e) {
       print('Error fetching user data: $e');
@@ -43,6 +53,9 @@ class _ProfilePageState extends State<ProfilePage> {
         _firstNameController.text = firstName;
         _lastNameController.text = lastName;
         _emailController.text = email;
+        _age = age;
+        _ageController.text = age?.toString() ?? '';
+        _selectedGender = gender;
       });
     }
   }
@@ -58,88 +71,101 @@ class _ProfilePageState extends State<ProfilePage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _ageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'PROFILE',
-          style: TextStyle(color: Colors.black, fontSize: 16),
-        ),
-        centerTitle: true,
+    return PopScope(
+      canPop: true, // set to false to disable back navigation
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            Center(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.purple.shade100,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.person,
-                  size: 80,
-                  color: Colors.purple.shade400,
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-            _buildTextField(
-              controller: _firstNameController,
-              label: 'First Name',
-            ),
-            const SizedBox(height: 20),
-            _buildTextField(
-              controller: _lastNameController,
-              label: 'Last Name',
-            ),
-            const SizedBox(height: 20),
-            _buildTextField(
-              controller: _emailController,
-              label: 'Email',
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                // Optional: Add save/edit functionality here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade300,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                  vertical: 15,
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          title: const Text(
+            'PROFILE',
+            style: TextStyle(color: Colors.black, fontSize: 16),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    size: 80,
+                    color: Colors.purple.shade400,
+                  ),
                 ),
               ),
-              child: Text(
-                'Edit Profile',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              const SizedBox(height: 40),
+              _buildTextField(
+                controller: _firstNameController,
+                label: 'First Name',
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              _buildTextField(
+                controller: _lastNameController,
+                label: 'Last Name',
+              ),
+              const SizedBox(height: 20),
+              _buildTextField(
+                controller: _emailController,
+                label: 'Email',
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 20),
+              _buildTextField(
+                controller: _ageController,
+                label: 'Age',
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 20),
+              _buildGenderField(
+                label: 'Gender',
+                value: _selectedGender ?? 'N/A',
+              ),
+              // const SizedBox(height: 40),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     // TODO: Add edit/save functionality
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.grey.shade300,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(30),
+              //     ),
+              //     padding: const EdgeInsets.symmetric(
+              //       horizontal: 50,
+              //       vertical: 15,
+              //     ),
+              //   ),
+              //   child: Text(
+              //     'Edit Profile',
+              //     style: TextStyle(
+              //       color: Colors.grey.shade700,
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
     );
@@ -164,16 +190,12 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          enabled: false, // Keeps it non-tappable
+          enabled: false,
           keyboardType: keyboardType,
-          // 1. Set the text style to prevent it from turning grey
-          style: const TextStyle(color: Colors.black), // <-- ADD THIS
+          style: const TextStyle(color: Colors.black),
           decoration: InputDecoration(
-            // 2. Define the border style for the disabled state
             disabledBorder: OutlineInputBorder(
-              // <-- CONFIGURE THIS
               borderRadius: BorderRadius.circular(10),
-              // Use the same color as your normal border
               borderSide: const BorderSide(color: Colors.grey),
             ),
             border: OutlineInputBorder(
@@ -184,6 +206,35 @@ class _ProfilePageState extends State<ProfilePage> {
               horizontal: 15,
               vertical: 15,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderField({required String label, required String value}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey),
+          ),
+          child: Text(
+            value,
+            style: const TextStyle(color: Colors.black, fontSize: 16),
           ),
         ),
       ],
