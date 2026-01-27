@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -11,59 +12,73 @@ class ChatbotPage extends StatefulWidget {
 class _ChatbotPageState extends State<ChatbotPage> {
   late final WebViewController _controller;
   bool _isLoading = true;
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize the controller simply
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar if needed
-          },
-          onPageStarted: (String url) {
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onWebResourceError: (WebResourceError error) {
-            debugPrint("WebView error: ${error.description}");
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse('https://mindcarechatbot.streamlit.app/'));
+    _initializeUser();
   }
 
+  void _initializeUser() {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      _userId = user.uid;
+
+      _controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageFinished: (_) => setState(() => _isLoading = false),
+          ),
+        )
+        ..loadRequest(
+          Uri.parse(
+            'https://mindcarechatbot.streamlit.app/?userid=$_userId',
+          ),
+        );
+    }
+  }
+
+  Future<void> _handleBack() async {
+    if (await _controller.canGoBack()) {
+      await _controller.goBack();
+    } else {
+      if (mounted) Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_userId == null) {
+      return const Scaffold(
+        body: Center(child: Text("Please login first.")),
+      );
+    }
+
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("MindCare AI Assessment"),
-      //   backgroundColor: Colors.white,
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back),
-      //       onPressed: () => Navigator.pop(context),
-      //   ),
-      // ),
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
+
           if (_isLoading)
             const Center(
-              child: CircularProgressIndicator(
-                  color: Colors.blueAccent
-              ),
-            )
+              child: CircularProgressIndicator(color: Colors.blueAccent),
+            ),
+
+          // 🔙 Floating Back Button (UI-safe)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 12,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.black.withOpacity(0.6),
+              elevation: 2,
+              onPressed: _handleBack,
+              child: const Icon(Icons.arrow_back, color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
