@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'dart:math'; // Imported to generate random numbers for the demo.
+import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mindcare/chatbot/chatbot.dart';
 import 'package:mindcare/settings.dart';
 import 'profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// 1. The main widget is now a StatefulWidget.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -14,12 +14,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// 2. The State class holds all the mutable data and the UI logic.
 class _HomePageState extends State<HomePage> {
-  // --- USER DATA ---
   String _userName = 'User';
-  // --- STATE VARIABLES ---
-  // These variables hold the data that can change over time.
   int _heartRate = 55;
   int _sleepQuality = 72;
   int _stresslevel = 45;
@@ -27,14 +23,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
-    String firstName = 'User'; // Default name
+    String firstName = 'User';
 
     if (user != null) {
-      // Check FirebaseAuth displayName first
       if (user.displayName != null && user.displayName!.isNotEmpty) {
         firstName = user.displayName!.split(' ').first;
       } else {
-        // Fetch firstname from Firestore
         try {
           final doc =
               await FirebaseFirestore.instance
@@ -117,7 +111,15 @@ class _HomePageState extends State<HomePage> {
       // Use the dedicated property for a floating button.
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
-        onPressed: _updateMetrics,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ChatbotPage(),
+            ),
+          );
+        },
+        // _updateMetrics,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.teal[400],
           shape: const StadiumBorder(),

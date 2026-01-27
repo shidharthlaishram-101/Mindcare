@@ -1,14 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-// Firebase Core and Auth are required for Firebase services
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// Google Sign-In package is needed for Google authentication
 import 'package:google_sign_in/google_sign_in.dart';
-// import 'package:mindcare/home.dart';
 import 'package:mindcare/login.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mindcare/userinfo.dart';
 
@@ -20,48 +15,31 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  // Controllers to manage user input for text fields
-  // final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // State variables for UI logic
   bool _isPasswordVisible = false;
   bool _agreeToTerms = false;
-  bool _isLoading =
-      false; // To show a loading indicator during async operations
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    // Dispose controllers to free up resources
-    // _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  // --- FIREBASE AUTHENTICATION LOGIC ---
-
-  // Function to handle email & password registration
   Future<void> _createAccountWithEmailAndPassword() async {
-    // Validate Terms Agreement
     if (!_agreeToTerms) {
       _showErrorSnackBar("Please agree to the Terms & Policy to continue.");
       return;
     }
-
-    // Input Validation (Pre-checks)
-    // final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // if (name.isEmpty) {
-    //   _showErrorSnackBar("Please enter your name.");
-    //   return;
-    // }
     if (email.isEmpty || !email.contains('@')) {
       _showErrorSnackBar("Please enter a valid email address.");
       return;
@@ -71,7 +49,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       return;
     }
 
-    // Set loading state to true
     setState(() {
       _isLoading = true;
     });

@@ -40,17 +40,17 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildSettingsTile("Privacy & Policy"),
           _buildSettingsTile("Terms & Conditions"),
           _buildSettingsTile("Rate & Review"),
-          SwitchListTile(
-            title: const Text("Switch to Dark-Mode"),
-            value: isDarkMode,
-            activeThumbColor: Colors.white,
-            activeTrackColor: Colors.blue,
-            onChanged: (bool value) {
-              setState(() {
-                isDarkMode = value;
-              });
-            },
-          ),
+          // SwitchListTile(
+          //   title: const Text("Switch to Dark-Mode"),
+          //   value: isDarkMode,
+          //   activeThumbColor: Colors.white,
+          //   activeTrackColor: Colors.blue,
+          //   onChanged: (bool value) {
+          //     setState(() {
+          //       isDarkMode = value;
+          //     });
+          //   },
+          // ),
           _buildSettingsTile("Log-Out", isLogout: true),
         ],
       ),
