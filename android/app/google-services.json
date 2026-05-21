@@ -34,6 +34,13 @@
             {
               "client_id": "196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "196820978897-b1ps1nfvs2022efo9p8jvj0q7ollvuqc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.major.mindcare"
+              }
             }
           ]
         }
