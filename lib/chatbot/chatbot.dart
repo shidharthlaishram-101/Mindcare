@@ -35,7 +35,7 @@ class _ChatbotPageState extends State<ChatbotPage> {
         )
         ..loadRequest(
           Uri.parse(
-            'https://mindcarechatbot.streamlit.app/?userid=$_userId',
+            'https://mindcarechatbot-sensor-test-backend.streamlit.app/?userid=$_userId',
           ),
         );
     }

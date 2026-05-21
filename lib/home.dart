@@ -16,9 +16,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userName = 'User';
-  int _heartRate = 55;
-  int _sleepQuality = 72;
-  int _stresslevel = 45;
+  // int _heartRate = 55;
+  // int _sleepQuality = 72;
+  // int _stresslevel = 45;
   final Random _random = Random();
 
   Future<void> _loadUserData() async {
@@ -61,17 +61,17 @@ class _HomePageState extends State<HomePage> {
 
   // --- STATE-CHANGING METHOD ---
   // This method updates the state variables and calls setState().
-  void _updateMetrics() {
-    // setState() tells Flutter to rebuild the widget tree with the new values.
-    setState(() {
-      // Generate new random values to simulate a "test" result.
-      _heartRate =
-          50 + _random.nextInt(21); // Random heart rate between 50 and 70
-      _sleepQuality =
-          60 + _random.nextInt(31); // Random sleep quality between 60 and 90
-      _stresslevel = 30 + _random.nextInt(41);
-    });
-  }
+  // void _updateMetrics() {
+  //   // setState() tells Flutter to rebuild the widget tree with the new values.
+  //   setState(() {
+  //     // Generate new random values to simulate a "test" result.
+  //     _heartRate =
+  //         50 + _random.nextInt(21); // Random heart rate between 50 and 70
+  //     _sleepQuality =
+  //         60 + _random.nextInt(31); // Random sleep quality between 60 and 90
+  //     _stresslevel = 30 + _random.nextInt(41);
+  //   });
+  // }
 
   // 3. The build method and all UI helper methods are now inside the State class.
   @override
@@ -97,8 +97,8 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
-              const SizedBox(height: 24),
-              _buildMetricsGrid(),
+              // const SizedBox(height: 24),
+              // _buildMetricsGrid(), remove comment from Line 225 if this comment is removed.
               const SizedBox(height: 24),
               _buildHistoricalTrendCard(),
               const SizedBox(height: 24),
@@ -222,65 +222,65 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// Builds the grid of metric cards using the current state values
-  Widget _buildMetricsGrid() {
-    return SizedBox(
-      height: 160, // fixed card height
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          SizedBox(
-            width: 200,
-            child: _MetricCard(
-              title: 'Heart Rate',
-              value: _heartRate.toString(),
-              unit: 'bpm',
-              iconWidget: Row(
-                children: [
-                  // Icon(Icons.show_chart, color: Colors.grey[600], size: 20),
-                  const SizedBox(width: 2),
-                  Icon(Icons.favorite, color: Colors.red[400], size: 20),
-                ],
-              ),
-              progress: _heartRate / 100.0,
-              progressColor: Colors.red[400]!,
-            ),
-          ),
-          const SizedBox(width: 16),
-          SizedBox(
-            width: 200,
-            child: _MetricCard(
-              title: 'Sleep Quality',
-              value: '$_sleepQuality%',
-              iconWidget: Row(
-                children: [
-                  const SizedBox(width: 2),
-                  Icon(Icons.bed, color: Colors.blueAccent, size: 20),
-                ],
-              ),
-              progress: _sleepQuality / 100.0,
-              progressColor: Colors.blueAccent,
-            ),
-          ),
-          const SizedBox(width: 16),
-          SizedBox(
-            width: 200,
-            child: _MetricCard(
-              title: 'Stress Level',
-              value: '$_stresslevel%',
-              progress: _stresslevel / 100.0,
-              iconWidget: Row(
-                children: [
-                  const SizedBox(width: 2),
-                  Icon(Icons.mood_rounded, color: Colors.deepOrange, size: 20),
-                ],
-              ),
-              progressColor: Colors.deepOrange,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildMetricsGrid() {
+  //   return SizedBox(
+  //     height: 160, // fixed card height
+  //     child: ListView(
+  //       scrollDirection: Axis.horizontal,
+  //       children: [
+  //         SizedBox(
+  //           width: 200,
+  //           child: _MetricCard(
+  //             title: 'Heart Rate',
+  //             value: _heartRate.toString(),
+  //             unit: 'bpm',
+  //             iconWidget: Row(
+  //               children: [
+  //                 // Icon(Icons.show_chart, color: Colors.grey[600], size: 20),
+  //                 const SizedBox(width: 2),
+  //                 Icon(Icons.favorite, color: Colors.red[400], size: 20),
+  //               ],
+  //             ),
+  //             progress: _heartRate / 100.0,
+  //             progressColor: Colors.red[400]!,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 16),
+  //         SizedBox(
+  //           width: 200,
+  //           child: _MetricCard(
+  //             title: 'Sleep Quality',
+  //             value: '$_sleepQuality%',
+  //             iconWidget: Row(
+  //               children: [
+  //                 const SizedBox(width: 2),
+  //                 Icon(Icons.bed, color: Colors.blueAccent, size: 20),
+  //               ],
+  //             ),
+  //             progress: _sleepQuality / 100.0,
+  //             progressColor: Colors.blueAccent,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 16),
+  //         SizedBox(
+  //           width: 200,
+  //           child: _MetricCard(
+  //             title: 'Stress Level',
+  //             value: '$_stresslevel%',
+  //             progress: _stresslevel / 100.0,
+  //             iconWidget: Row(
+  //               children: [
+  //                 const SizedBox(width: 2),
+  //                 Icon(Icons.mood_rounded, color: Colors.deepOrange, size: 20),
+  //               ],
+  //             ),
+  //             progressColor: Colors.deepOrange,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   /// Builds the historical trend card
   Widget _buildHistoricalTrendCard() {
@@ -300,7 +300,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Historical Trend (Sensors)',
+            'Historical Trend',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -345,16 +345,16 @@ class _HomePageState extends State<HomePage> {
               color: Colors.grey[800],
             ),
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Sleep Pattern',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Your sleep pattern is good.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
+          // const SizedBox(height: 16),
+          // const Text(
+          //   'Sleep Pattern',
+          //   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+          // ),
+          // const SizedBox(height: 4),
+          // Text(
+          //   'Your sleep pattern is good.',
+          //   style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          // ),
           const SizedBox(height: 16),
           const Text(
             'Recommendation',
@@ -365,16 +365,16 @@ class _HomePageState extends State<HomePage> {
             'Maintain a consistent sleep schedule.',
             style: TextStyle(color: Colors.grey[600], fontSize: 14),
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Activity Recommendation',
-            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Based on your current metrics, we recommend light physical activity to boost your mood and energy.',
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
+          // const SizedBox(height: 16),
+          // const Text(
+          //   'Activity Recommendation',
+          //   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+          // ),
+          // const SizedBox(height: 4),
+          // Text(
+          //   'Based on your current metrics, we recommend light physical activity to boost your mood and energy.',
+          //   style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          // ),
         ],
       ),
     );
