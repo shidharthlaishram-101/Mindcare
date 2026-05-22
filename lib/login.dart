@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mindcare/home.dart';
 import 'package:mindcare/registration.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
 // LoginPage widget builds the main screen UI for signing in.
 class LoginPage extends StatefulWidget {
@@ -25,6 +26,17 @@ class _LoginPageState extends State<LoginPage> {
   // State variables for UI logic
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _googleSignIn.initialize(
+      clientId: Platform.isIOS
+          ? '196820978897-b1ps1nfvs2022efo9p8jvj0q7ollvuqc.apps.googleusercontent.com'
+          : '196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com',
+      serverClientId: '196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com',
+    );
+  }
 
   @override
   void dispose() {
@@ -75,12 +87,12 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // Initialize the GoogleSignIn instance (v7.2.0)
-      await _googleSignIn.initialize(
-        clientId:
-            '196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com',
-        serverClientId:
-            '196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com',
-      );
+      // await _googleSignIn.initialize(
+      //   clientId:
+      //       '196820978897-05usfqpl4oaqv5pgg476ku46v8lm2q0k.apps.googleusercontent.com',
+      //   serverClientId:
+      //       '196820978897-vtliblh35qhc32fqal88fci5cuo1tq0s.apps.googleusercontent.com',
+      // );
 
       // Trigger Google Sign-In
       final GoogleSignInAccount? googleUser =
