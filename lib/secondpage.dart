@@ -93,7 +93,7 @@ class Secondpage extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Navigate to the Registration Page
-                    Navigator.push
+                    Navigator.pushReplacement
                       (context,
                         PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) => const RegistrationPage(),
@@ -139,7 +139,7 @@ class Secondpage extends StatelessWidget {
                   ),
                   onPressed: () {
                     // Navigate to the Registration Page
-                    Navigator.push
+                    Navigator.pushReplacement
                       (context,
                         PageRouteBuilder(
                             pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
