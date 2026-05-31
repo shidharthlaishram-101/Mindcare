@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mindcare/chatbot/chatbot.dart';
 import 'package:mindcare/settings.dart';
@@ -19,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   // int _heartRate = 55;
   // int _sleepQuality = 72;
   // int _stresslevel = 45;
-  final Random _random = Random();
+  // final Random _random = Random();
 
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;

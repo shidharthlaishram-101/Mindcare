@@ -216,7 +216,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16.0,

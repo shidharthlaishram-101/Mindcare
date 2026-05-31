@@ -15,7 +15,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   String? _selectedGender;
-  int? _age;
+  // int? _age;
 
   Future<void> _loadUserData() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -53,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _firstNameController.text = firstName;
         _lastNameController.text = lastName;
         _emailController.text = email;
-        _age = age;
+        // _age = age;
         _ageController.text = age?.toString() ?? '';
         _selectedGender = gender;
       });
